@@ -1,0 +1,1 @@
+# monero25words-dice-cli-generator
