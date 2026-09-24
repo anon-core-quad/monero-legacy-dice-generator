@@ -126,6 +126,10 @@ echo -e "Generated SHA512 from sequence:\n$sha512value \n"
 #        32,
 #    )
 
+#if [[ $DEBUG -eq 0 ]]; then
+#	# Take the first 3 characters of each word and concatenate them
+#	firstThreeCharactersOfEachWord="lusbagstamicimivilganeffstrdiftogvaipucroppansholiamoimemsorsynketswedeh"
+#fi
 
 
 #echo ${#sha512value}
@@ -139,7 +143,6 @@ hex2bin=(0000 0001 0010 0011 0100 0101 0110 0111 1000 1001 1010 1011 1100 1101 1
 BINARY_CONVERSION=""
 for (( i=0; i<${#sha512value}; i++ )); do
     hexValue=$((16#${sha512value:$i:1}))
-	#echo $hexValue
 	BINARY_CONVERSION+=${hex2bin[hexValue]}
 done
 
@@ -154,7 +157,6 @@ fi
 declare -A moneroLegacySeedwords
 j=1
 while IFS= read -r line; do
-echo $line
 	moneroLegacySeedwords[$j]=$line
 	((j++))
 done < <(cat ${WORD_FILE} | tail -n +3 | awk '{print $4}')
@@ -177,17 +179,15 @@ done < <(fold -w11 <<< "$BINARY_CONVERSION")
 
 #echo -n $BINARY_CONVERSION[0] | tr [:lower:] [:upper:] | xargs -I{} sh -c 'echo "obase=10; ibase=2; {}"' | bc
 
-
 rows=$(printf '%s\n' "${!finalMatrix[@]}" | cut -d',' -f1 | sort -un | wc -l)
 #echo ${rows}
 
 # Print a table of the results
 
 declare -A filtered25Words
-printf "%-8s %-15s %-10s %-20s\n" "Position" "Binary" "Decimal+1" "Word"
-printf "%s\n" "---------------------------------------"
 j=1
 i=1
+firstThreeCharactersOfEachWord=""
 
 while : ; do
 	
@@ -200,7 +200,7 @@ while : ; do
 		filtered25Words["$j,1"]=${finalMatrix[$i,1]}
 		filtered25Words["$j,2"]=${finalMatrix[$i,2]}
 		filtered25Words["$j,3"]=$j
-		printf "%-8s %-15s %-10s %-20s\n" "${filtered25Words[$j,3]}" "${filtered25Words[$j,0]}" "${filtered25Words[$j,1]}" "${filtered25Words[$j,2]}"
+		firstThreeCharactersOfEachWord+=${filtered25Words[$j,2]:0:3}
 		((j += 1))
     fi
 	
@@ -209,39 +209,46 @@ done
 
 echo ""
 
-COLUMNS=100
+firstThreeCharactersOfEachWord=$(echo "lush bagpipe stacking mice imitate village gang efficient strained different together vain puck roped pancakes shocking liar moisture memoir sorry syndrome kettle swept dehydrate" | tr -d ' ')
 
-#if [ $DEBUG -eq 1 ]; then
-#	echo -e "SHA512 BINARY CONVERSION:\n$(echo -n "$BINARY_CONVERSION" | fold -w 11) \n"
-#fi
-
-
-
-
-exit 1
-
-
-
-
-
-
-
-# 
-# 
-
-
-generatedWords="lush bagpipe stacking mice imitate village gang efficient strained different together vain puck roped pancakes shocking liar moisture memoir sorry syndrome kettle swept dehydrate"
-
-# Take the first 3 characters of each word and concatenate them
-firstThreeCharactersOfEachWord="lusbagstamicimivilganeffstrdiftogvaipucroppansholiamoimemsorsynketswedeh"
+#firstThreeCharactersOfEachWord=$(echo "fetches sincerely kiosk haystack drying adult hectare distance fowls trendy mews evenings rural identity nouns observant baffles nephew racetrack duties tell aimless tell deity" | tr -d ' ')
 
 # Calculate the CRC32 checksum of the concatenated string. In this case, the checksum gives us the decimal number
 checksum=$(printf '%s' $firstThreeCharactersOfEachWord | gzip -1 -c | tail -c8 | od -t u4 -N 4 -A n)   
 
 # Take the checksum index modulo 24. In this case, the modulo gives us 8.
-#2248614488%24=8
-wordIndex=$checksum%8
+wordIndex=$(( checksum % 8 ))
+
+echo $wordIndex
+
+twentyfivestWord=${filtered25Words["$wordIndex,2"]}
 
 # The 8th index of the wordlist is strained (don't forget that the wordlist is 0-indexed). So, the checksum word is strained.
 
 
+echo -e "CHECKSUM WORD $twentyfivestWord \n"
+
+printf "%-8s %-15s %-10s %-20s\n" "Position" "Binary" "Decimal+1" "Word"
+printf "%s\n" "---------------------------------------"
+
+for ((j=1; j<=${SEED_WORDS}; j++)); do
+	printf "%-8s %-15s %-10s %-20s\n" "${filtered25Words[$j,3]}" "${filtered25Words[$j,0]}" "${filtered25Words[$j,1]}" "${filtered25Words[$j,2]}"
+done
+filtered25Words["25,0"]="1111"
+filtered25Words["25,1"]=9
+filtered25Words["25,2"]=$twentyfivestWord
+filtered25Words["25,3"]=25
+
+printf "%-8s %-15s %-10s %-20s\n" "${filtered25Words[25,3]}" "${filtered25Words[25,0]}" "${filtered25Words[25,1]}" "${filtered25Words[25,2]}"
+
+
+# Print inline seed words
+printf "SEED WORDS:\n"
+printf '=%.0s' $(seq 1 $((COLUMNS)))
+printf "\n"
+for i in $(seq 1 $((SEED_WORDS+1))); do
+    printf "%s " "${filtered25Words[$i,2]}"
+done
+printf "\n"
+printf '=%.0s' $(seq 1 $((COLUMNS)))
+printf "\n"
