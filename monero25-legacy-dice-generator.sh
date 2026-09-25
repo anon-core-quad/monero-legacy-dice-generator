@@ -189,6 +189,13 @@ j=1
 i=1
 firstThreeCharactersOfEachWord=""
 
+
+#firstThreeCharactersOfEachWord=$(echo "lush bagpipe stacking mice imitate village gang efficient strained different together vain puck roped pancakes shocking liar moisture memoir sorry syndrome kettle swept dehydrate" | tr -d ' ')
+#firstThreeCharactersOfEachWord=$(echo "itself pamphlet language gimmick sake arises guest opened itself went huge ribbon kidneys motherly awning vary gave apricot tipsy olive algebra jury nexus nostril" | tr -d ' ')  #tipsy
+
+#firstThreeCharactersOfEachWord=$(echo "fetches sincerely kiosk haystack drying adult hectare distance fowls trendy mews evenings rural identity nouns observant baffles nephew racetrack duties tell aimless tell deity" | tr -d ' ')
+
+
 while : ; do
 	
 	if [[ $i -ge ${rows} || $j -gt $((SEED_WORDS)) ]]; then
@@ -200,28 +207,28 @@ while : ; do
 		filtered25Words["$j,1"]=${finalMatrix[$i,1]}
 		filtered25Words["$j,2"]=${finalMatrix[$i,2]}
 		filtered25Words["$j,3"]=$j
-		firstThreeCharactersOfEachWord+=${filtered25Words[$j,2]:0:3}
+		firstThreeCharactersOfEachWord+="${filtered25Words[$j,2]:0:3}"
 		((j += 1))
     fi
 	
 	((i += 1))
 done
 
-echo ""
-
-firstThreeCharactersOfEachWord=$(echo "lush bagpipe stacking mice imitate village gang efficient strained different together vain puck roped pancakes shocking liar moisture memoir sorry syndrome kettle swept dehydrate" | tr -d ' ')
-
-#firstThreeCharactersOfEachWord=$(echo "fetches sincerely kiosk haystack drying adult hectare distance fowls trendy mews evenings rural identity nouns observant baffles nephew racetrack duties tell aimless tell deity" | tr -d ' ')
+echo "$firstThreeCharactersOfEachWord"
 
 # Calculate the CRC32 checksum of the concatenated string. In this case, the checksum gives us the decimal number
 checksum=$(printf '%s' $firstThreeCharactersOfEachWord | gzip -1 -c | tail -c8 | od -t u4 -N 4 -A n)   
 
-# Take the checksum index modulo 24. In this case, the modulo gives us 8.
-wordIndex=$(( checksum % 8 ))
+# Take the checksum index modulo 24
+wordIndex=$(( (checksum % SEED_WORDS) + 1 ))
 
-echo $wordIndex
 
-twentyfivestWord=${filtered25Words["$wordIndex,2"]}
+echo $checksum
+echo ${wordIndex}
+
+echo $filtered25Words
+
+twentyfivestWord=${filtered25Words[${wordIndex},2]}
 
 # The 8th index of the wordlist is strained (don't forget that the wordlist is 0-indexed). So, the checksum word is strained.
 
@@ -234,8 +241,8 @@ printf "%s\n" "---------------------------------------"
 for ((j=1; j<=${SEED_WORDS}; j++)); do
 	printf "%-8s %-15s %-10s %-20s\n" "${filtered25Words[$j,3]}" "${filtered25Words[$j,0]}" "${filtered25Words[$j,1]}" "${filtered25Words[$j,2]}"
 done
-filtered25Words["25,0"]="1111"
-filtered25Words["25,1"]=9
+filtered25Words["25,0"]=""
+filtered25Words["25,1"]=0
 filtered25Words["25,2"]=$twentyfivestWord
 filtered25Words["25,3"]=25
 
