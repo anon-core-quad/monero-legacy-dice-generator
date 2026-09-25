@@ -67,22 +67,22 @@ https://raw.githubusercontent.com/SafeKeys/monero-mnemonic-seeds/refs/heads/main
 
 So we need to consider 11 bits per word, so the words are encoded in this way:
 
-Decimal     Binary          Word        Hex
--------------------------------------------------
-1           00000000001     abbey       001
-2           00000000010     abducts     002
-3           00000000011     ability     003
-4           00000000100     ablaze      004
-                [...]
-256         00100000000     cocoa       100
-                [...]    
-1024        10000000000     oven        400
-                [...]    
-1625        11001011001     zones       659
-1626        11001011010     zoom        65A
-1627        11001011011                 65B
-                [...]    
-2048        11111111111                 7FF
+| Decimal |    Binary     |   Word     |  Hex  |
+|---------|---------------|------------|-------|
+| 1       |  00000000001  |   abbey    |   001 |
+| 2       |  00000000010  |   abducts  |   002 |
+| 3       |  00000000011  |   ability  |   003 |
+| 4       |  00000000100  |   ablaze   |   004 |
+|               [...]                          |
+| 256     |  00100000000  |   cocoa    |   100 |
+|               [...]                          |
+| 1024    |  10000000000  |   oven     |   400 |
+|               [...]                          | 
+| 1625    |  11001011001  |   zones    |   659 |
+| 1626    |  11001011010  |   zoom     |   65A |
+| 1627    |  11001011011  |            |   65B |
+|               [...]                          |
+| 2048    |  11111111111  |            |   7FF |
 
 The values above 1626 are discarded, for this reason we need to insert the double of entropy. This way, we have a fairly high chance of finding all 24 valid words.
 If an unluky case happen, the script alert you to add some values in the entropy sequence to change the final result.
