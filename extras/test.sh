@@ -23,3 +23,5 @@ wordIndex=$(( checksum % 24 ))
 echo $checksum
 echo $finalString
 echo $wordIndex
+
+twentyfivestWord=${filtered25Words["${wordIndex-1},2"]}
