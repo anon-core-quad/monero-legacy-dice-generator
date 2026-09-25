@@ -229,7 +229,11 @@ wordIndex=$(( (checksum % SEED_WORDS) + 1 ))
 
 twentyfivestWord=${filtered25Words[${wordIndex},2]}
 
-echo -e "CHECKSUM WORD $twentyfivestWord \n"
+echo -e "CHECKSUM WORD: $twentyfivestWord \n"
+
+# Get the index of the 25th word, just to print in the table
+indexWord25=$(cat ${WORD_FILE} | tail -n +3 | awk -v w="$twentyfivestWord" '$4==w {print $2}')
+
 
 printf "%-8s %-15s %-10s %-20s\n" "Position" "Binary" "Decimal+1" "Word"
 printf "%s\n" "---------------------------------------"
@@ -239,11 +243,14 @@ for ((j=1; j<=${SEED_WORDS}; j++)); do
 done
 
 # Add the 25th word to the list, the checksum
-filtered25Words["25,0"]=""
-filtered25Words["25,1"]=0
+filtered25Words["25,0"]=$(printf '%011s' "$(echo "obase=2; $indexWord25" | bc)" | tr ' ' '0')
+filtered25Words["25,1"]=$indexWord25
 filtered25Words["25,2"]=$twentyfivestWord
 filtered25Words["25,3"]=25
 printf "%-8s %-15s %-10s %-20s\n" "${filtered25Words[25,3]}" "${filtered25Words[25,0]}" "${filtered25Words[25,1]}" "${filtered25Words[25,2]}"
+
+
+COLUMNS=100
 
 # Print inline seed words
 printf "\nSEED WORDS:\n"
