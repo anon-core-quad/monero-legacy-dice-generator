@@ -77,7 +77,6 @@ done
 if [ $DISCLMAINERS -eq 1 ]; then
 	while : 
 	do
-		clear
 		cat<<EOF
 ========================================================================================================================
 Disclaimer 1: This software and any outputs it generates are provided “as is” and without warranties of any kind, 
